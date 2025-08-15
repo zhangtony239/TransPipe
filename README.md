@@ -8,7 +8,7 @@ TransPipe is a hybrid symbolic-neural reasoning architecture centered on a **mod
 ## Core Philosophy (Key Concept)  
 - **Train once, hit many times**: Trans compiles the input-output mappings, semantic branches, and execution strategies into the Pipe (inference cache / execution graph) during training.  
 - **Pipe = inference cache + semantic router**: Pipe is not a simple output cache nor an implicit attention pathway. It structurally stores the learned semantic logic and execution sequences for fast matching and execution at inference time.  
-- **Pipefile: orchestrating Pen clusters**: While Pipe stores the reusable semantic units, a **Pipefile** specifies the macro-level architecture of a Pipe, including which Pens handle which semantic sub-tasks, the data flow between them, and high-level IO mappings. Actual parallelization and execution order are dynamically determined by the training job and available hardware, allowing flexible scaling while preserving logical consistency.  
+- **Pipefile = orchestrating Pen clusters**: While Pipe stores the reusable semantic units, a **Pipefile** specifies the macro-level architecture of a Pipe, including which Pens handle which semantic sub-tasks, the data flow between them, and high-level IO mappings. Actual parallelization and execution order are dynamically determined by the training job and available hardware, allowing flexible scaling while preserving logical consistency.  
 - **Hit first, fallback controlled**: If input semantics match a Pipe entry, the system executes the cached plan or returns the cached result quickly. If no match is found, the Trans (fallback model) computes a new plan and updates the Pipe cache.  
 - **Engineering value**: This approach shifts the costly dense computation of online inference to one-time training/compilation overhead and lightweight cache hits, significantly reducing long-term inference cost while improving stability and interpretability.
 
@@ -16,20 +16,26 @@ TransPipe is a hybrid symbolic-neural reasoning architecture centered on a **mod
 
 ## Core Components (Conceptual)  
 - **Trans (Training Controller / Compiler)**  
-  - The main training-stage component that learns to decompose tasks into semantic nodes, routing conditions, and execution sequences, outputting the Pipe (inference cache entries / execution graph).  
+
+  - The main training-stage component that learns to decompose tasks into semantic nodes, routing conditions, and execution sequences, outputting the Pipe (inference cache entries / execution graph).  
 - **Pipe (Inference Cache / Semantic Router)**  
-  - A structured cache library: each entry contains semantic signatures, matching strategies, and execution plans specifying modules to call, order, and parameters.  
+
+  - A structured cache library: each entry contains semantic signatures, matching strategies, and execution plans specifying modules to call, order, and parameters.  
   - Performs fast semantic matching at runtime to execute plans or return results on hits.  
-- **Pipefile (Macro Orchestration File)**  
+- **Pipefile (Macro Orchestration File)**
+
   - Defines the logical structure of a Pipe by specifying which Pens (translation units) handle which semantic sub-tasks.  
   - Establishes high-level IO mapping and data flow without micromanaging execution order, leaving parallelization and job slicing to hardware and training runtime.  
   - Ensures logical consistency and composability across large Pipe clusters.  
 - **Successor Modules (Toolbox)**  
-  - Lightweight sub-models, specialized operators, API calls, or rule engines triggered by Pipe execution plans.  
+
+  - Lightweight sub-models, specialized operators, API calls, or rule engines triggered by Pipe execution plans.  
 - **Fallback Trans**  
-  - Handles rare or cache-miss inputs with more expensive inference, then inserts or updates Pipe accordingly.  
+
+  - Handles rare or cache-miss inputs with more expensive inference, then inserts or updates Pipe accordingly.  
 - **Cache Management & Consistency Mechanisms** (engineering focus)  
-  - Signature design, similarity thresholds, expiration/replacement policies, verification, and rollback.
+
+  - Signature design, similarity thresholds, expiration/replacement policies, verification, and rollback.
 
 ---
 
@@ -120,4 +126,3 @@ TransPipe is a hybrid symbolic-neural reasoning architecture centered on a **mod
 - Cache consistency, rollback, and safety mechanisms for erroneous plans  
 - Training-to-Pipe distillation/compilation methods to guarantee equivalence or controlled degradation  
 - Evaluation metrics design: hit rate, cost savings, robustness, interpretability
-- 
